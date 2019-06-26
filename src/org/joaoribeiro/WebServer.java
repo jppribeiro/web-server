@@ -18,7 +18,7 @@ public class WebServer {
 
         try {
 
-            serverSocket = new ServerSocket(8080);
+            serverSocket = new ServerSocket(8085);
 
         } catch (IOException ex) {
             System.out.println("IO Exception while setting a new server socket.");
@@ -60,6 +60,7 @@ public class WebServer {
                 break;
         }
 
+        close();
         start();
 
     }
@@ -74,6 +75,16 @@ public class WebServer {
 
         } catch (IOException ex) {
             System.out.println("IO exception");
+        }
+
+    }
+
+    private void close() {
+
+        try {
+            clientSocket.close();
+        } catch (IOException ex) {
+            System.out.println("IO exception trying to close connection.");
         }
 
     }
@@ -162,6 +173,11 @@ public class WebServer {
 
     private ReqType requestType(String request) {
 
+        if(request.length() < 5) {
+            System.out.println("Can't find resource.");
+            return ReqType.HTML;
+        }
+
         String extension = request.substring(request.length() - 3);
 
         if (extension.equals("jpg") ||
@@ -188,12 +204,12 @@ public class WebServer {
             case HTML:
                 return "HTTP/1.0 " + code.getCode() + " Document Follows\r\n" +
                         "Content-Type: text/html; charset=UTF-8\r\n" +
-                        "Content-Length: " + contentLength + " \r\n" +
+                        "Content-Length: " + contentLength + "\r\n" +
                         "\r\n";
             case IMAGE:
                 return "HTTP/1.0 " + code.getCode() + " Document Follows\r\n" +
                         "Content-Type: image/" + getImgExtension(path) + "\r\n" +
-                        "Content-Length: " + contentLength + " \r\n" +
+                        "Content-Length: " + contentLength + "\r\n" +
                         "\r\n";
             default:
                 break;
