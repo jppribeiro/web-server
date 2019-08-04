@@ -28,40 +28,39 @@ public class WebServer {
 
     public void start() {
 
-        String request = "";
+        while(true) {
+            String request = "";
 
-        String response = "";
+            String response = "";
 
-        String[] reqArray;
+            String[] reqArray;
 
-        try {
+            try {
 
-            listen();
+                listen();
 
-            request = in.readLine();
+                request = in.readLine();
 
-            System.out.println(request);
+                System.out.println(request);
 
-        } catch (IOException ex) {
-            System.out.println("IO exception");
+            } catch (IOException ex) {
+                System.out.println("IO exception");
+            }
+
+            reqArray = request.split(" ");
+
+            String reqType = reqArray[0];
+
+            switch (reqType) {
+                case "GET":
+                    get(reqArray);
+                    break;
+                default:
+                    break;
+            }
+
+            close();
         }
-
-        reqArray = request.split(" ");
-
-        System.out.println(reqArray[0]);
-
-        String reqType = reqArray[0];
-
-        switch (reqType) {
-            case "GET":
-                get(reqArray);
-                break;
-            default:
-                break;
-        }
-
-        close();
-        start();
 
     }
 
@@ -158,6 +157,8 @@ public class WebServer {
 
         System.out.println(buildHeader(Status.OK, getFileSize(path), ReqType.IMAGE, path));
 
+        System.out.println(path);
+
         out.println(buildHeader(Status.OK, getFileSize(path), ReqType.IMAGE, path));
 
 
@@ -241,9 +242,9 @@ public class WebServer {
 
     private void serveImage(String path) throws IOException{
 
-        System.out.println(path);
+        File file = new File(path);
 
-        FileInputStream fileInputStream = new FileInputStream(path);
+        FileInputStream fileInputStream = new FileInputStream(file);
 
         BufferedInputStream bStream = new BufferedInputStream(fileInputStream);
 
@@ -255,7 +256,6 @@ public class WebServer {
 
         while ((num = bStream.read(buffer)) > 0) {
 
-            System.out.println(num);
             dOutStream.write(buffer, 0, num);
         }
 
